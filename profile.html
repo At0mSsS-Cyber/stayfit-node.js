@@ -1,0 +1,143 @@
+<html lang="en">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <title>Profile</title>
+    <style>
+         body {
+        font-family: 'Open Sans', sans-serif;
+        font-weight: 300;
+        line-height: 1.42em;
+        color:#A7A1AE;
+        background-color:#1F2739;
+        }
+        img{
+		height: 40px;
+		width: 40px;
+    }
+    table{
+        border-collapse: separate;   
+     }
+
+    </style>
+</head>
+<body><div id="app">
+    <header class="default-header">
+        <nav class="navbar navbar-expand-lg  navbar-light">
+          <div class="container">
+            <a class="navbar-brand" href="#" @click="home">
+                <div class="logo">
+                  <img src="/img/logo.png" alt="logo">
+                </div>
+              </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+              aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="lnr lnr-menu">=</span>
+            </button>
+    
+            <div class="collapse navbar-collapse justify-content-end align-items-center" id="navbarSupportedContent">
+              <ul class="navbar-nav">
+                <li><a href="#" @click="home">Home</a></li>
+                <li ><a class="active" href="#" @click="profile" >Profile</a></li>
+                <li ><a v-if="bmiFixed>23" href="#" @click="workouts">Workouts</a></li>
+                <li ><a v-if="bmiFixed>23" href="#" @click="weightFlow">Weight Flow</a></li>
+                <li><a href="#" @click="calorieChart">Calorie Sheet</a></li>
+                <li><a href="#" @click="logout">Logout</a></li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </header>
+<div class="containers">
+    <table>
+        <tr><th>BMI</th><td>{{ bmi }}</td></tr>
+        <tr><th>Ideal BMI</th><td>23</td></tr>
+        <tr><th>Current weight</th><td>{{ item.weight }} kg</td></tr>
+        <tr><th>Ideal weight</th><td>{{ idealWeight }} kg</td></tr>
+        <tr><th>Current calories needed(BMR)</th><td>{{ calories }} calories/day</td></tr>
+        <tr><th>Ideal calories needed(BMR)</th><td>{{ caloriesNeeded }} calories/day</td></tr>
+        <tr><td align="center" colspan="3" v-if="bmiFixed == 23">Live your life</td><td align="center" colspan="3" v-if="bmiFixed>23"><font style="font-family: 'Lucida Sans'; color: #f11400;">OVER WEIGHT</font></td><td align="center" colspan="3" v-if="bmiFixed<23"><font style="font-family: 'Lucida Sans'; color: rgb(0, 110, 255);">UNDER WEIGHT</font></td></tr>
+        <tr><td align="center" colspan="3" v-if="bmiFixed < 23 || bmiFixed > 23"><a v-if="bmiFixed < 23" @click=calorieChart href="#">Way To Fit</a><a v-if="bmiFixed > 23" @click=exercise href="#">Way To Fit</a></td></tr>
+    </table>
+</div>
+</div>
+</body>
+<script>
+
+    let app = new Vue({
+          el: '#app',
+          data: {
+              item: {},
+              bmi: '',
+              bmiFixed: 0,
+              currentWeight: '',
+              currentHeight: '',
+              idealWeight: '',
+              differnce: '',
+              calories: '',
+              caloriesNeeded: '',
+              
+          },
+      
+          methods: {
+              
+              calculateBmi(){
+                  this.bmi = this.item.weight/(this.item.height * this.item.height);
+              },
+              logout(){
+                axios.post('/api/logout', ).then(resp => {})
+                window.location.pathname = '/';
+              },
+              exercise(){
+                  window.location.pathname = '/api/user/profile/workout';
+              },
+              calorieChart(){
+                  window.location.pathname = '/api/user/profile/calorie_sheet';
+              },
+              workouts() {
+                window.location.pathname = '/api/user/profile/workout';
+              },
+              weightFlow() {
+                window.location.pathname = '/api/user/profile/weightFlow';
+              },
+              profile() {
+                    window.location.pathname = '/api/user/profile';
+              },
+              home() {
+                    window.location.pathname = '/';
+              },
+
+              },
+         mounted() {
+            axios.get('/api/user/profile1').then(response => {
+                this.item = response.data;
+                this.walk = 0;
+                this.currentHeight = this.item.height;
+                this.currentWeight = this.item.weight;                
+                this.bmi = (this.currentWeight/(this.currentHeight * this.currentHeight)).toFixed(2);
+                this.bmiFixed = (this.currentWeight/(this.currentHeight * this.currentHeight)).toFixed();
+                //this.bmiFixed = (this.bmi).toFixed(2);
+                this.idealWeight = (this.currentHeight * this.currentHeight * 23).toFixed();
+                this.differnce = (this.currentWeight - this.idealWeight).toFixed(2);
+                if (this.item.gender == "male")
+                {
+                    this.calories = ((10 * this.currentWeight) + (6.25 * this.currentHeight * 100) - ( 5 * this.item.age) +5).toFixed(2);
+                    this.caloriesNeeded = ((10 * this.idealWeight) + (6.25 * this.currentHeight * 100) - ( 5 * this.item.age) +5).toFixed(2);
+
+                }
+                else
+                {
+                    this.calories = ((10 * this.currentWeight) + (6.25 * this.currentHeight * 100) - ( 5 * this.item.age) -161).toFixed(2);
+                    this.caloriesNeeded = ((10 * this.idealWeight) + (6.25 * this.currentHeight * 100) - ( 5 * this.item.age) -161).toFixed(2);
+                }
+         })
+        }
+   }); 
+  </script>
+</html>

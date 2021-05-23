@@ -1,0 +1,483 @@
+<html lang="en">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout</title>
+    <style>
+        .form{
+         margin-top: 0%;
+         padding-top: 3%;
+        }
+        
+        .work{
+            background-color: #d6f5c6  ;
+        }
+        select {
+        border: solid 8px;
+        border-block-color: red;
+        height: 30px;
+        /* border-top: solid; */
+        border-block-style: inherit;
+        }
+    
+    .inp{
+            width: 30px;
+        }
+    img{
+        width:90px;
+        height:90px;
+    }
+    table{
+        width: 75%;
+        margin-left: auto;
+        margin-right: auto;
+        border-collapse:separate;
+    }
+    .selecte{
+        background-color: #03A9F4;
+    }
+    .next_day{
+        padding-top: 182px;
+        text-align: center;
+        background-color: rgb(68, 76, 68);
+        font-weight: bold;
+        font-size: 20px;
+        height: 87%;
+        color: rgb(197, 177, 209);
+    }
+    .next_day a{
+        color: ivory;
+    }
+    img.card-img-top {
+    height: 45%;
+    padding: 5% 8%;
+}
+.form-control {
+    display: inline;
+    width: 52px;
+    text-align: center;
+
+}
+.card-text{
+    text-align: center;
+}
+
+.card-group{
+    width: 70%;
+    height: 70%;
+}
+.card{
+    border: solid 5px #03a9f46b;
+}
+    </style>
+</head>
+<body>
+    <div id="app">
+    <header class="default-header">
+        <nav class="navbar navbar-expand-lg  navbar-light">
+          <div class="container">
+            <a class="navbar-brand" href="#" @click="home">
+                <div class="logo">
+                  <img src="/img/logo.png" alt="logo">
+                </div>
+              </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+              aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="lnr lnr-menu">=</span>
+            </button>
+    
+            <div class="collapse navbar-collapse justify-content-end align-items-center" id="navbarSupportedContent">
+              <ul class="navbar-nav">
+                <li><a href="#" @click="home">Home</a></li>
+                <li ><a  href="#" @click="profile" >Profile</a></li>
+                <li ><a href="#" class="active" @click="workouts">Workouts</a></li>
+                <li><a href="#" @click="weightFlow">Weight Flow</a></li>
+                <li><a href="#" @click="calorieChart">Calorie Sheet</a></li>
+                <li><a href="#" @click="logout">Logout</a></li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </header>
+      <div class="work" v-if="item.last_update !== currentDate">
+ 
+        <div class="form"><center>
+            <select v-model="level" @change="selectLevel">
+              <option value="" disabled selected>Select the intensity</option>
+              <option style="background-color: rgb(113, 223, 132);" value="easy">Easy</option>
+              <option style="background-color: rgb(113, 223, 214);" value="medium">Medium</option>
+              <option style="background-color: rgb(236, 233, 39);" value="hard">Hard</option>
+              <option style="background-color: rgb(250, 60, 26);" value="insane">Insane</option>    
+            </select></center>
+        </div>
+           <div class="calorieCount sticky-top"><div v-if="caloriesBurns >0 "> You have to burn {{ caloriesBurns }} calories today</div><div v-if="(walk_completed || squats_completed || push_completed || drink_completed) && selected && (caloriesBurns < 0) || (item.last_update == currentDate) ">You have completed today's target<br><button class="btn btn-success" @click="reduceWeight">Come Next Day</button></div><br></div>
+            <div class="daysNeeded">{{ daysNeed }} days to go</div>
+          
+        <br>
+        <div class="card-deck container-fluid">
+            <div class="card">
+              <img v-bind:class="{selecte: walk_completed }" class="card-img-top"  src="https://images.squarespace-cdn.com/content/v1/5512bbfbe4b0febe53ba78b7/1551870715415-BH0D7HIF8BSEGGEROVBY/ke17ZwdGBToddI8pDm48kCPjJEwVxoWu-a6fDO2tahlZw-zPPgdn4jUwVcJE1ZvWQUxwkmyExglNqGp0IvTJZUJFbgE-7XRK3dMEBRBhUpzG_M0QaKsAl8BxedMLsghD7ZFg78kHwKStikxvxJlz_CV-wvXUdJGomOlHHsDGnec/JOGGING.gif?format=1500w" alt="Card image cap">
+              <div class="card-body">
+                <h5 class="card-title">Walking</h5>
+                <p class="card-text">Enter the time in minutes spent to walking.</p>
+                <br><p class="card-text"><button @click=walkDecrement class="btn btn-secondary">-</button><input class="inp form-control" v-model="walk" type="text"><button class="btn btn-secondary" @click=walkIncrement>+</button></p>
+                <p class="card-text"><button class="btn btn-primary" v-if="walk_completed" @click="walkCompleted">Undo<button v-if="!walk_completed" class="btn btn-success" @click="walkCompleted">Done</button></p>
+                <p class="card-text" v-if="walk_completed"><small class="text-muted">Calories burned: {{ walk_calories }}</small></p>
+            </div>
+            </div>
+            <div class="card">
+              <img class="card-img-top" v-bind:class="{ selecte: squats_completed }" src="https://images.squarespace-cdn.com/content/v1/54f9e84de4b0d13f30bba4cb/1530743652042-8AW6T0MPM6Q0JYEV6AO9/ke17ZwdGBToddI8pDm48kMh3mVmBaCAeGwqCLG3iONRZw-zPPgdn4jUwVcJE1ZvWQUxwkmyExglNqGp0IvTJZamWLI2zvYWH8K3-s_4yszcp2ryTI0HqTOaaUohrI8PIBW4H-Ca6AoigG7Ta8YXcF_lHpbhrmZNZWbxxrH_bJLk/image-asset.gif" alt="Card image cap">
+              <div class="card-body">
+                <h5 class="card-title">Squats</h5>
+                <p class="card-text">Enter the total number of squats done today.</p>
+                <br><p class="card-text"><button @click=squatsDecrement class="btn btn-secondary">-</button><input v-model="squats" class="inp form-control" type="text"><button class="btn btn-secondary" @click=squatsIncrement>+</button></p>
+                <p class="card-text"><button v-if="squats_completed" class="btn btn-primary" @click="squatsCompleted">Undo<button class="btn btn-success" v-if="!squats_completed" @click="squatsCompleted">Done</button></p>
+                <p class="card-text" v-if="squats_completed"><small class="text-muted">Calories burned: {{ squats_calories }}</small></p>
+            </div>
+            </div>
+            <div class="card">
+              <img class="card-img-top" v-bind:class="{ selecte: push_completed }" src="https://media4.giphy.com/media/RKNAWSvKBONiF7iAtL/source.gif" alt="Card image cap">
+              <div class="card-body">
+                <h5 class="card-title">Push ups</h5>
+                <p class="card-text">Enter the total number of squats done today.</p>
+                <br><p class="card-text"><button @click=pushDecrement class="btn btn-secondary">-</button><input v-model ="push" class="inp form-control" type="text"><button class="btn btn-secondary" @click=pushIncrement>+</button></p>
+                <p class="card-text"><button v-if="push_completed" class="btn btn-primary" @click="pushCompleted">Undo<button class="btn btn-success" v-if="!push_completed" @click="pushCompleted">Done</button></p>
+                <p class="card-text" v-if="push_completed"><small class="text-muted">Calories burned: {{ push_calories }}</small></p>
+            </div>
+            </div>
+        </div>
+        <br>
+        <div class="card-deck container-fluid">
+            <div class="card">
+              <img v-bind:class="{ selecte: drink_completed }" class="card-img-top" src="https://i.pinimg.com/originals/79/c7/ff/79c7ff9d622c8fae535a06898f0d6700.gif" alt="Card image cap">
+              <div class="card-body">
+                <h5 class="card-title">Drinking Water</h5>
+                <p class="card-text">Enter the amount of water drunk in litre.</p>
+                <br><p class="card-text"><button @click=drinksDecrement class="btn btn-secondary">-</button><input v-model="drinks" class="inp form-control" type="text"><button class="btn btn-secondary" @click=drinksIncrement>+</button></p>
+                <p class="card-text"><button v-if="drink_completed" class="btn btn-primary" @click="drinkCompleted">Undo<button v-if="!drink_completed" class="btn btn-success" @click="drinkCompleted">Done</button></p>
+                <p class="card-text" v-if="drink_completed"><small class="text-muted">Calories burned: {{ drinks_calories }}</small></p>
+            </div>
+            </div>
+            <div class="card">
+              <img v-bind:class="{ selecte: plank_completed }" class="card-img-top" src="https://seven.app/media/images/Plank.gif" alt="Card image cap">
+              <div class="card-body">
+                <h5 class="card-title">Planks</h5>
+                <p class="card-text">Enter the total minutes spent to do plank.</p>
+                <br><p class="card-text"><button @click=plankDecrement class="btn btn-secondary">-</button><input v-model="plank" class="inp form-control" type="text"><button class="btn btn-secondary" @click=plankIncrement>+</button></p>
+                <p class="card-text"><button v-if="plank_completed" class="btn btn-primary" @click="plankCompleted">Undo<button v-if="!plank_completed" class="btn btn-success" @click="plankCompleted">Done</button></p>
+                <p class="card-text" v-if="plank_completed"><small class="text-muted">Calories burned: {{ plank_calories }}</small></p>
+              </div>
+            </div>
+            <br>
+            <div class="card">
+              <img v-bind:class="{ selecte: swim_completed }" class="card-img-top" src="https://i.pinimg.com/originals/55/71/6a/55716a785271be047265665ad469cddb.gif" alt="Card image cap">
+              <div class="card-body">
+                <h5 class="card-title">Swimming</h5>
+                <p class="card-text">Enter the total time in minutes spent to swimming.</p>
+                <br><p class="card-text"><button @click=swimDecrement class="btn btn-secondary">-</button><input v-model="swim" class="inp form-control" type="text"><button class="btn btn-secondary" @click=swimIncrement>+</button></p>
+                <p class="card-text"><button v-if="swim_completed" class="btn btn-primary" @click="swimCompleted">Undo<button v-if="!swim_completed" class="btn btn-success" @click="swimCompleted">Done</button></p>
+                <p class="card-text" v-if="swim_completed"><small class="text-muted">Calories burned: {{ swim_calories }}</small></p>
+              </div>
+            </div>
+          </div>
+    <br><br><br><br><br><br><br><br> 
+    
+</div>
+<div class="next_day" v-if="item.last_update == currentDate">
+You have completed today's workouts.
+Come back tomorrow.<br><a href="#" @click="back">Click</a>
+</div>
+</div>
+</body>
+<script type="application/javascript"> 
+    let app = new Vue({
+        el: '#app',
+        data: {
+            item:{},
+            caloriesBurn:0,
+            caloriesBurns:0,
+            level:'',
+            currentHeight:'',
+            currentWeight: '',
+            idealWeight: '',
+            differnce: 0,
+            day: 0.0,
+            daysNeed:0, 
+            walk: 0,
+            push:0,
+            squats: 0,
+            drinks: 0,
+            plank:0,
+            swim: 0,
+            information: '',
+            selected: false,
+            walk_completed: false,
+            push_completed: false,
+            squats_completed: false,
+            drink_completed: false,
+            plank_completed:false,
+            swim_completed: false,
+            walk_calories : 0,
+            push_calories : 0,
+            squats_calories : 0,
+            drinks_calories : 0,
+            plank_calories : 0,
+            swim_calories : 0,
+            weightBurned: 0,
+            newWeight:0,
+            currentDate:'',
+            currentYear:'',
+            currentMonth:'',
+            currentDay:'',
+            calender:[],
+            entry:{},
+        },
+        methods: {
+            walkCompleted(){
+                if (this.walk_completed == false)
+                {
+                    this.walk_completed = true;
+                    //multiplying calories burned in one minute and total number of minutes worked out
+                    this.walk_calories = (this.walk*((0.035 * this.currentWeight) + ((1.4*1.4) / this.currentHeight) * (0.029*this.currentWeight))).toFixed(2);
+                }
+                else
+                {
+                    this.walk_completed = false;
+                    this.walk_calories = 0;
+                }
+                this.caloriesBurns = (this.caloriesBurn - this.swim_calories - this.plank_calories - this.walk_calories - this.push_calories - this.squats_calories -this.drinks_calories).toFixed(2);
+
+            },
+            pushCompleted(){
+                if (this.push_completed == false)
+                {
+                    this.push_completed = true;
+                    //taking a normal person can do 30 push ups in one minute.
+                    //multiplying calories burned in one minute and total number of minutes worked out.
+                    this.push_calories = (this.push * (((3.8*3.5*this.currentWeight)/200)/30)).toFixed(2);
+                     
+                }
+                else
+                {
+                    this.push_completed = false;
+                    this.push_calories = 0;
+                }
+                this.caloriesBurns = (this.caloriesBurn - this.swim_calories - this.plank_calories - this.walk_calories - this.push_calories - this.squats_calories -this.drinks_calories).toFixed(2);
+            },
+            squatsCompleted(){
+                if (this.squats_completed == false)
+                {
+                    this.squats_completed = true;
+                    //Considering a normal person can do 45 squats in one minute.
+                    //multiplying calories burned in one minute and total number of minutes worked out.
+                    this.squats_calories = (this.squats * ((0.0175*3.5*this.currentWeight)/45)).toFixed(2);
+                }
+                else
+                {
+                    this.squats_completed = false;
+                    this.squats_calories = 0;
+                }
+                this.caloriesBurns = (this.caloriesBurn - this.swim_calories - this.plank_calories - this.walk_calories - this.push_calories - this.squats_calories -this.drinks_calories).toFixed(2);
+            },
+            drinkCompleted(){
+                if (this.drink_completed == false)
+                {
+                    this.drink_completed = true;
+                    //1.5L burns 50 calories. 
+                    this.drinks_calories = (this.drinks * (50/1.5)).toFixed(2);
+                }
+                else
+                {
+                    this.drink_completed = false;
+                    this.drinks_calories = 0;
+                }
+                this.caloriesBurns = (this.caloriesBurn - this.swim_calories - this.plank_calories - this.walk_calories - this.push_calories - this.squats_calories -this.drinks_calories).toFixed(2);
+            },
+            plankCompleted(){
+                if (this.plank_completed == false)
+                {
+                    this.plank_completed = true;
+                    if(this.currentWeight < 50)
+                    {
+                        this.plank_calories = this.plank * 2;
+                    }
+                    else if(this.currentWeight < 68 )
+                    {
+                        this.plank_calories = this.plank * 3.5;
+                    }
+                    else
+                        this.plank_calories = this.plank * 4.5;
+                }
+                else
+                {
+                    this.plank_completed = false;
+                    this.planks_calories = 0;
+                }
+                this.caloriesBurns = (this.caloriesBurn - this.swim_calories - this.plank_calories - this.walk_calories - this.push_calories - this.squats_calories -this.drinks_calories).toFixed(2);
+            }, 
+            swimCompleted(){
+                if (this.swim_completed == false)
+                {
+                    this.swim_completed = true;
+                    //1.5L burns 50 calories. 
+                    this.swim_calories = (this.swim * ((3.5 * this.currentWeight * 1.5)/200)).toFixed(2);
+                }
+                else
+                {
+                    this.swim_completed = false;
+                    this.swim_calories = 0;
+                }
+                this.caloriesBurns = (this.caloriesBurn - this.swim_calories - this.plank_calories - this.walk_calories - this.push_calories - this.squats_calories -this.drinks_calories).toFixed(2);
+            },
+           
+            selectLevel(){
+                this.selected = true;
+                switch (this.level) {
+                    case "easy":    this.caloriesBurn = 500;
+                                    this.caloriesBurns = 500;
+                                    let num=0;
+                                    this.daysNeed = (this.differnce/(0.45/7)).toFixed();
+                                    break;
+                    case "medium":   this.caloriesBurn = 750;
+                                    this.caloriesBurns = 750;
+                                    this.daysNeed = (this.differnce/(0.45*1.5/7)).toFixed();  
+                                    break;
+                    case "hard":    this.caloriesBurn = 1000;
+                                    this.caloriesBurns = 1000;
+                                    this.daysNeed = (this.differnce/(0.45*2/7)).toFixed();  
+                                    break;
+                    case "insane":  this.caloriesBurn = 1250;
+                                    this.caloriesBurns = 1250;
+                                    this.daysNeed = (this.differnce/(0.45*2.5/7)).toFixed();  
+                                    break;
+
+                }
+                
+            },
+            logout(){
+                axios.post('/api/logout', ).then(resp => {})
+                window.location.pathname = '/';
+              },
+              exercise(){
+                  window.location.pathname = '/api/user/profile/workout';
+              },
+              calorieChart(){
+                  window.location.pathname = '/api/user/profile/calorie_sheet';
+              },
+              workouts() {
+                window.location.pathname = '/api/user/profile/workout';
+              },
+              weightFlow() {
+                window.location.pathname = '/api/user/profile/weightFlow';
+              },
+              profile() {
+                    window.location.pathname = '/api/user/profile';
+              },
+              home() {
+                    window.location.pathname = '/';
+              },
+
+              walkIncrement(){
+                this.walk = this.walk+1;
+              },
+              walkDecrement(){
+                if(this.walk >= 1 )
+                    this.walk -= 1;
+              },
+              pushIncrement(){
+                this.push = this.push+1;
+              },
+              pushDecrement(){
+                if(this.push >= 1 )
+                    this.push -= 1;
+              },
+              squatsIncrement(){
+                this.squats = this.squats+1;
+              },
+              squatsDecrement(){
+                if(this.squats >= 1 )
+                    this.squats -= 1;
+              },
+              drinksIncrement(){
+                this.drinks = this.drinks+1;
+              },
+              drinksDecrement(){
+                if(this.drinks >= 1 )
+                    this.drinks -= 1;
+              },
+              plankIncrement(){
+                this.plank = this.plank+1;
+              },
+              plankDecrement(){
+                if(this.plank >= 1 )
+                    this.plank -= 1;
+              },
+              swimIncrement(){
+                this.swim = this.swim+1;
+              },
+              swimDecrement(){
+                if(this.swim >= 1 )
+                    this.swim -= 1;
+              },
+              reduceWeight(){
+                  //1 pound (0.45 kg) weight will be reduced in one week if 500 calories burned every day. 
+                 if(this.item.last_update !== this.currentDate) 
+                  {
+                        this.weightBurned = ((0.45 * (this.caloriesBurn / 500)) / 7).toFixed(2);
+                        this.newWeight = (this.currentWeight - this.weightBurned).toFixed(2);
+                        var d = this.currentDate;
+                        //var d = "2021/01/06";
+                        var cal=[];
+                        var it = {};
+                        it[d] = this.weightBurned;
+                        console.log(typeof(this.calender));
+                        if(typeof(this.calender) !== undefined)
+                            var cal = this.calender;
+                        cal.push(it);
+                        this.calender = cal;
+                        console.log(this.calender);
+                        axios.put(`/api/user/profile/workout/`, {
+                            weight: this.newWeight,
+                            cal: this.calender,
+                            last: this.currentDate,
+                        })
+                        .then(response => {
+                        }); 
+                   }
+                   window.location.pathname = '/api/user/profile';
+              },
+              back(){
+                window.location.pathname = '/api/user/profile';
+              },
+              callFunction(){
+                  this.currentDate = new Date().toJSON().slice(0,10).replace(/-/g,'/');
+                  this.currentYear = this.currentDate.slice(0,4);
+                  this.currentMonth = this.currentDate.slice(5,7);
+                  this.currentDay = this.currentDate.slice(8,10);
+              },
+
+             
+        },
+        mounted(){
+            
+            axios.get('/api/user/profile/workout1').then(response => {
+                this.item = response.data;
+                this.calender = response.data.calender;
+                this.currentWeight = this.item.weight;
+                this.currentHeight = this.item.height;
+                this.idealWeight = (this.currentHeight * this.currentHeight * 23.5).toFixed(2);
+                this.differnce = (this.currentWeight - this.idealWeight).toFixed(2);
+                this.day = (this.differnce + this.daysNeed);
+                this.callFunction();
+            })
+        }
+    });
+</script>
+</html>

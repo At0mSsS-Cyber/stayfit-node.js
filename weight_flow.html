@@ -1,0 +1,119 @@
+<!DOCTYPE html><html class=''>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+     <style>
+      .containers {
+      width: 70% ;
+      margin-left: auto ;
+      margin-right: auto ;
+      padding-top: 5%;
+      }
+     body{
+         background-color: rgb(231 136 136 / 49%);
+     }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+        <header class="default-header">
+            <nav class="navbar navbar-expand-lg  navbar-light">
+              <div class="container">
+                <a class="navbar-brand" href="#" @click="home">
+                    <div class="logo">
+                      <img src="/img/logo.png" alt="logo">
+                    </div>
+                  </a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                  aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                  <span class="lnr lnr-menu">=</span>
+                </button>
+        
+                <div class="collapse navbar-collapse justify-content-end align-items-center" id="navbarSupportedContent">
+                  <ul class="navbar-nav">
+                    <li><a href="#" @click="home">Home</a></li>
+                    <li ><a  href="#" @click="profile" >Profile</a></li>
+                    <li ><a href="#" @click="workouts">Workouts</a></li>
+                    <li><a href="#" class="active" @click="">Weight Flow</a></li>
+                    <li><a href="#" @click="calorieChart">Calorie Sheet</a></li>
+                    <li><a href="#" @click="logout">Logout</a></li>
+                  </ul>
+                </div>
+              </div>
+            </nav>
+          </header>
+      <section class="containers">	
+	  <div class="columns">
+	    <div class="column">
+	      <chartjs-line  :labels="labels" :data="dataset"  :fill="bd" :bind="true" :datalabel="hi"></chartjs-line>
+	    </div>	    
+	  </div>    
+	</section>
+    </div>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/vue/2.1.10/vue.min.js'></script>
+    <script src='//unpkg.com/vue-chartjs@2.6.0/dist/vue-chartjs.full.min.js'></script>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.js'></script>
+    <script src='//unpkg.com/hchs-vue-charts@1.2.8'></script>
+    <script >'use strict';
+
+      Vue.use(VueCharts);
+      var app = new Vue({
+        el: '#app',
+        data: {
+            dataentry: null,
+            datalabel: null,
+            labels: [],
+            dataset: [],
+            bd:'#f87979',
+            hi:"Weight Flow",
+            item:[],
+            key:'',
+        },
+
+        methods: {
+            logout(){
+                axios.post('/api/logout', ).then(resp => {})
+                window.location.pathname = '/';
+              },
+              exercise(){
+                  window.location.pathname = '/api/user/profile/workout';
+              },
+              calorieChart(){
+                  window.location.pathname = '/api/user/profile/calorie_sheet';
+              },
+              workouts() {
+                window.location.pathname = '/api/user/profile/workout';
+              },
+              profile() {
+                    window.location.pathname = '/api/user/profile';
+              },
+              home() {
+                    window.location.pathname = '/';
+              },
+        },
+        mounted(){
+            axios.get('/api/user/profile/workout1').then(response => {
+                this.item = response.data;
+                var temp = 0;
+                var value;
+                var k;
+                this.key= parseInt(this.item.calWeight);  
+                for(k in this.item.calender)
+                {
+                    this.key = (this.key - temp);
+                    this.labels.push(Object.keys(this.item.calender[k]));
+                    this.dataset.push(this.key);
+                    temp = Object.values(this.item.calender[k]);
+                }
+                //this.backgroundColor = '#f87979';
+            })
+        }
+      });
+    </script>
+  </body>
+</html>

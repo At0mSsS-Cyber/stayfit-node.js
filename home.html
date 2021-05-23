@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<head>
+    <title>Home</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div id="nav">
+  <header class="default-header">
+    <nav class="navbar navbar-expand-lg  navbar-light">
+      <div class="container">
+        <a class="navbar-brand" href="#" @click="home">
+          <div class="logo">
+            <img src="/img/logo.png" alt="logo">
+          </div>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="lnr lnr-menu">=</span>
+        </button>
+
+        <div class="collapse navbar-collapse justify-content-end align-items-center" id="navbarSupportedContent">
+          <ul class="navbar-nav">
+            <li><a href="" class="active">Home</a></li>
+            <li v-if="flag"><a href="#" @click="profile">Profile</a></li>
+            <!---<li v-if="flag"><a href="#" @click="workouts">Workouts</a></li>--->
+            <li><a href="#" @click="calorie">Calorie Sheet</a></li>
+            <li v-if="!flag"><a href="#" @click="open('login')">Login/Register</a></li>
+            <li v-if="flag"><a href="#" @click="logout">Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+    </div>
+  <div class="user-modal-container" :class="{ 'active': active }" id="sign-in" @click="close">
+    <div class="user-modal">
+      <ul class="form-switcher">
+        <li @click="Switcher('login')"><a href="#" id="login-form">Login</a>
+        </li>
+        <li @click="Switcher('register')"><a href="#" id="register-form">Register</a>
+        </li>
+        
+      </ul>
+      <div class="form-register" :class="{ 'active': active == 'register' }" id="form-register">
+        <div v-if=" this.notification !== ''"><font color="red">*{{ notification }}</font></h3></div>
+        <input type="text" name="name" placeholder="Name" v-model="registerName" required>
+        <input type="email" name="email" placeholder="Email" v-model="registerEmail" required>
+        <input type="password" name="password" placeholder="Password" v-model="registerPassword" required>
+        <input type="submit" :class="{ 'disabled': submitted == 'register' }" @click="register" v-model="registerSubmit" id="registerSubmit">
+        <div class="links"> <a href="#" @click="Switcher('login')">Already have an account?</a>
+  
+        </div>
+      </div>
+      <div class="form-login" :class="{ 'active': active == 'login' }" id="form-login">
+        <div v-if=" this.notification !== ''"><font color="red">*{{ notification }}</font></h3></div>
+        <input type="text" name="user" placeholder="Email or Username" v-model="loginUser">
+        <input type="password" name="password" placeholder="Password" v-model="loginPassword" >
+        <input type="submit" :class="{ 'disabled': submitted == 'login' }" @click="login" v-model="loginSubmit" id="loginSubmit">
+        <div class="links"> <a href="#" @click="Switcher('password')">Forgot your password?</a>
+  
+        </div>
+      </div>
+      <div class="form-password" :class="{ 'active': active == 'password' }" id="form-password">
+        <input type="text" name="email" placeholder="Email" v-model="passwordEmail">
+        <input type="submit" :class="{ 'disabled': submitted == 'password' }" @click="submit('password')" v-model="passwordSubmit" id="passwordSubmit">
+      </div>
+    </div>
+  </div>
+  <div class="pic">
+      <img src="https://www.mobihealthnews.com/sites/default/files/pivot.jpeg" width="100%">
+  </div>
+  <div class="content">
+    <p>"Track your progress by tracking your food intake, water consumption, workouts and much more to stay on track."</p>
+  </div>
+  <div class="ban">
+  <div class="left">
+    <div class="icon-container">
+      <img src="https://s3-ap-southeast-1.amazonaws.com/healthifyme-prod/home_website/images/scale-bathroom.png" class="left-feature-icon" />
+      <p class="icon-container--details">
+        <span class="icon-container--title"><b>Comprehensive Tracker</b></span>
+        <br>
+        <span class="icon-container--description">Keep a tab on your lifestyle by logging your food, activity, water, weight and steps on a daily basis.</span>
+      </p>
+    </div>
+    <br>
+    <div class="icon-container">
+      <img src="https://s3-ap-southeast-1.amazonaws.com/healthifyme-prod/home_website/images/calendar-check.png" class="left-feature-icon" />
+      <p class="icon-container--details">
+        <span class="icon-container--title"><b>Daily To-Dos</b></span>
+        <br>
+        <span class="icon-container--description">Not sure what to do next? Our smart digital coach gives you fun, daily tasks, to keep you on the road to weight
+          loss.
+        </span>
+      </p>
+    </div>
+    <br>
+    <div class="icon-container">
+      <img src="https://s3-ap-southeast-1.amazonaws.com/healthifyme-prod/home_website/images/chart-histogram.png" class="left-feature-icon" />
+      <p class="icon-container--details">
+        <span class="icon-container--title"><b>Automated & Real-time Insights</b></span>
+        <br>
+        <span class="icon-container--description">See historic data, macro-nutrients breakdown and daily insights on your calorie budgets.</span>
+      </p>
+    </div>
+    <br>
+  </div>
+  <div class="banner">
+      <img src="https://s1.travix.com/blog/ge/general-weights-on-wood-background-medium.jpg">
+  </div>
+  </div>
+  <div class="footer">
+
+  </div>
+
+</body>
+<script>
+    
+    let nav = new Vue({
+      el: '#nav',
+      data:{
+        item : {},
+        flag : false,
+      },
+      methods: {
+        open: function(which) {
+          modal.active = which;
+        },
+        calorie() {
+            window.location.pathname = '/api/user/profile/calorie_sheet';
+        },
+        workouts() {
+            window.location.pathname = '/api/user/profile/workout';
+        },
+        profile() {
+            window.location.pathname = '/api/user/profile';
+        },
+        home() {
+            window.location.pathname = '/';
+        },
+        logout(){
+                axios.post('/api/logout', ).then(resp => {})
+                window.location.pathname = '/';
+              },
+      },
+    mounted(){
+        axios.get('/api/home').then(response => {
+                this.item = response.data;
+                if(response.data.message == "login plz")
+                {
+                    this.flag = false;
+                }
+                else if(this.item.flag == false )
+                    this.flag = false;
+                else
+                    this.flag = true;
+        })
+    }
+});
+    
+    var modal = new Vue({
+      el: '#sign-in',
+      data: {
+        active: null,
+        submitted: null,
+        users:[],
+        notification: '',
+        registerName: '',
+        registerEmail: '',
+        registerPassword: '',
+        loginUser: '',
+        loginPassword: '',
+        passwordEmail: '',
+      },
+      methods: {
+        close: function(e) {
+          if (e.target === this.$el) {
+            this.active = null;
+          this.notification = '';
+          }
+        },
+        
+        Switcher(which) {
+          if (which !== this.active) {
+            this.active = which;
+            this.notification = '';
+          }
+        },
+        register() {
+                    let payload = {
+                        username: this.registerName,
+                        email: this.registerEmail,
+                        password: this.registerPassword,
+                        flag: false,
+                    }
+                    if(payload.name !=='' && payload.email !=='' && payload.password !=='') {
+                        axios.post('/api/register', payload)
+                        .then(response => {
+                            this.users.push(response.data);
+                            this.notification = '';
+                            axios.post('/api/login', { username: payload.username, password: payload.password }).then(resp => {
+                              if (resp.data == 'Cannot find user')
+                             {
+                               switcher('login');
+                              this.notification = 'Enter valid user name and password';
+                                this.loginUser = '';
+                                this.loginPassword = '';
+                              
+                             }
+                             else
+                            {
+                                
+                                this.notification = '';
+                                window.location.pathname = "/api/profile";
+                            }
+                            })
+    
+                    })}
+                    else {
+                        this.notification = `Fill up all the fields`;
+                    }
+                    
+                },
+                login(){
+                         if (this.loginUser == '' && this.loginPassword == '')
+                         {
+                          this.notification = `Fill up all the fields`;
+                         }
+                        else
+                        {
+                             axios.post('/api/login', { username: this.loginUser, password: this.loginPassword }).then(resp => {
+                              if (resp.data == 'Cannot find user')
+                             {
+                              this.notification = 'Enter valid user name and password';
+                                this.loginUser = '';
+                                this.loginPassword = '';
+                              
+                             }
+                             else
+                            {
+                              axios.post('/api/valid', { username: this.loginUser, password: this.loginPassword }).then(resp => {
+                               if(resp.data == 'No details')
+                                   window.location.pathname = "/api/profile";
+                                if(resp.data == 'Yeah there is')
+                                  window.location.pathname = "/api/user/profile";
+                               }) 
+                            }
+                            });
+                        }
+                    },
+    
+        
+      }
+    });
+    
+      </script>
+</html>
